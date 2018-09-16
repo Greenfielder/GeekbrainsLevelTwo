@@ -21,16 +21,14 @@ public class ClientHandler {
             sc = new Scanner(socket.getInputStream());
             pw = new PrintWriter(socket.getOutputStream(), true);
             new Thread(() -> {
-
                 do {
-                    auth();
                     try {
-                        socket.setSoTimeout(1200);
+                        socket.setSoTimeout(120000);
                     } catch (SocketException e) {
                         e.printStackTrace();
                     }
-
-                } while (isLogin = true);
+                    auth();
+                } while (isLogin == true);
 
                 System.out.println(nick + " handler waiting for new massages");
                 while (socket.isConnected()) {
@@ -63,6 +61,7 @@ public class ClientHandler {
             if (!sc.hasNextLine()) continue;
             String s = sc.nextLine();
             if (s.startsWith("/auth")) {
+
                 String[] commands = s.split(" ");// /auth login1 pass1
                 if (commands.length >= 3) {
                     String login = commands[1];
