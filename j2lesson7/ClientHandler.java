@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Scanner;
 
 public class ClientHandler {
@@ -11,7 +12,7 @@ public class ClientHandler {
     private PrintWriter pw;
     private Scanner sc;
     private String nick;
-    private DataInputStream in ;
+    private DataInputStream in;
     private boolean isLogin = false;
 
     public ClientHandler(Socket socket, Server server) {
@@ -20,10 +21,15 @@ public class ClientHandler {
             sc = new Scanner(socket.getInputStream());
             pw = new PrintWriter(socket.getOutputStream(), true);
             new Thread(() -> {
-                
+
                 do {
-                    server.setSoTimeout(1200);
                     auth();
+                    try {
+                        socket.setSoTimeout(1200);
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                    }
+
                 } while (isLogin = true);
 
                 System.out.println(nick + " handler waiting for new massages");
@@ -48,6 +54,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
+
     /**
      * Wait for command: "/auth login1 pass1"
      */
@@ -86,9 +93,11 @@ public class ClientHandler {
             }
         }
     }
+
     public void sendMessage(String msg) {
         pw.println(msg);
     }
+
     public String getNick() {
         return nick;
     }
