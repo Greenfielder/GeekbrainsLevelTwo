@@ -12,6 +12,7 @@ public class Server {
     private AuthService authService;
     private boolean isLogin = false;
     private List<ClientHandler> clients = new ArrayList<>();
+    private int soTimeout;
 
     public Server(AuthService authService) {
         this.authService = authService;
@@ -43,11 +44,6 @@ public class Server {
         while (true) {
             try {
                 Socket clientSocket = serverSocket.accept();
-//                if (serverSocket != null && !serverSocket.isClosed() && !isLogin) {
-//                    ClientHandler clientHandler = new ClientHandler(clientSocket, this);
-//                } else {
-//                    serverSocket.setSoTimeout(120000);
-//                }
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -86,7 +82,6 @@ public class Server {
 
     public void subscribe(ClientHandler clientHandler) {
         String msg = "Клиент " + clientHandler.getNick() + " подключился";
-        isLogin = true;
         sendBroadcastMessage(msg);
         System.out.println(msg);
         clients.add(clientHandler);
@@ -97,5 +92,9 @@ public class Server {
         sendBroadcastMessage(msg);
         System.out.println(msg);
         clients.remove(clientHandler);
+    }
+
+    public void setSoTimeout(int soTimeout) {
+        this.soTimeout = soTimeout;
     }
 }

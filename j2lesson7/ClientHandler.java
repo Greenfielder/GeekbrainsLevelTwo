@@ -12,6 +12,7 @@ public class ClientHandler {
     private Scanner sc;
     private String nick;
     private DataInputStream in ;
+    private boolean isLogin = false;
 
     public ClientHandler(Socket socket, Server server) {
         this.server = server;
@@ -19,7 +20,12 @@ public class ClientHandler {
             sc = new Scanner(socket.getInputStream());
             pw = new PrintWriter(socket.getOutputStream(), true);
             new Thread(() -> {
-                auth();
+                
+                do {
+                    server.setSoTimeout(1200);
+                    auth();
+                } while (isLogin = true);
+
                 System.out.println(nick + " handler waiting for new massages");
                 while (socket.isConnected()) {
                     String s = sc.nextLine();
@@ -68,6 +74,7 @@ public class ClientHandler {
                     } else {
                         this.nick = nick;
                         String msg = "Auth ok!";
+                        isLogin = true;
                         System.out.println(msg);
                         pw.println(msg);
                         server.subscribe(this);
